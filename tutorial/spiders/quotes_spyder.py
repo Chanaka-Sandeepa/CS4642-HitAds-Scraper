@@ -1,27 +1,40 @@
 import scrapy
+# from scrapy.selector import HtmlXPathSelector
 
 
 class QuotesSpider(scrapy.Spider):
-    name = "quotes"
+    name = "TRC_Services"
 
     def start_requests(self):
         urls = [
-            'http://www.trc.gov.lk/#home1',
-            'http://www.trc.gov.lk/#home2',
-            'http://www.trc.gov.lk/#home3',
-            'http://www.trc.gov.lk/#home4',
-            'http://www.trc.gov.lk/#home5',
+            'http://www.trc.gov.lk/2014-05-13-13-23-17/events/755-15th-apt-telecommunication-ict-development-forum.html',
+            'http://www.trc.gov.lk/world-telecommunication-information-society-day-2018.html',
+            'http://www.trc.gov.lk/notice-to-cable-tv-and-direct-to-home-satellite-tv-service-providers.html',
+            'http://www.trc.gov.lk/mr-p-r-s-p-jayathilake-is-the-new-director-general-of-trcsl.html',
+            'http://www.trc.gov.lk/2014-05-13-13-23-17/events/662-his-excellency-the-president-of-sri-lanka-graced-the-17th-apt-policy-and-regulatory-forum.html',
+            'http://www.trc.gov.lk/nisadiya.html',
+            'http://www.trc.gov.lk/2014-05-13-03-46-49/right-to-information.html',
+            'http://www.trc.gov.lk/spectrum-management/spectrum-management-in-sri-lanka.html',
+            'http://www.trc.gov.lk/2014-08-13-11-31-28/numbering.html',
+            'http://www.trc.gov.lk/2014-08-13-11-31-28/network-equipment/import-clearance.html',
+            'http://www.trc.gov.lk/2014-08-13-11-31-28/guidelines.html',
+            'http://www.trc.gov.lk/2014-05-12-12-36-13/system-licence/licensing-procedure-issuance-renewal.html',
+            'http://www.trc.gov.lk/2014-05-12-12-36-13/system-licence/licenced-operator-list.html',
+            'http://www.trc.gov.lk/2014-05-12-12-36-13/system-licence/public-notice-on-issuence-renewal-modification-of-licences.html',
+            'http://www.trc.gov.lk/2014-05-12-12-36-13/system-licence/public-consultation.html',
+            'http://www.trc.gov.lk/2014-05-12-12-36-13/frequency-licence.html',
+            'http://www.trc.gov.lk/2014-05-12-12-36-13/2014-05-12-13-18-07/list-of-licenced-vendors.html',
+            'http://www.trc.gov.lk/2014-05-12-12-36-13/2014-05-12-13-18-07/vendor-licence-procedure.html',
+            'http://www.trc.gov.lk/2014-05-12-13-20-23/tariff-regulation.html',
+            'http://www.trc.gov.lk/2014-05-12-13-20-23/telco-levies.html',
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        page = response.url.split("/")[-2]
-        filename = '%s.html' % page
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-        self.log('Saved file %s' % filename)
+        yield {
 
-        next_page = response.css('li.next a::attr(href)').extract_first()
-        if next_page is not None:
-            yield response.follow(next_page, callback=self.parse)
+            'title': response.css('title::text').extract_first(),
+            # 'text': response.xml('//*[@class="itemContentText"]//table//text()').extract_first(),
+            # 'tags': quote.css('div.tags a.tag::text').extract(),
+        }
