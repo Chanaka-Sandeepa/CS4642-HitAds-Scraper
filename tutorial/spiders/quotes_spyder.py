@@ -5,6 +5,12 @@ import scrapy
 class QuotesSpider(scrapy.Spider):
     name = "HitAds_Spyder"
 
+    def process_text(text):
+        text = text.replace('\r', '')
+        text = text.replace('\t', '')
+        text = text.replace("\n", "")
+        return text
+
     def start_requests(self):
 
         urls = [
@@ -29,18 +35,6 @@ class QuotesSpider(scrapy.Spider):
             # 'http://www.trc.gov.lk/2014-05-12-13-20-23/tariff-regulation.html',
             # 'http://www.trc.gov.lk/2014-05-12-13-20-23/telco-levies.html',
             'http://www.hitad.lk/EN/cars',
-            # 'http://www.hitad.lk/EN/cars?page=25',
-            # 'http://www.hitad.lk/EN/cars?page=50',
-            # 'http://www.hitad.lk/EN/cars?page=75',
-            # 'http://www.hitad.lk/EN/cars?page=100',
-            # 'http://www.hitad.lk/EN/cars?page=125',
-            # 'http://www.hitad.lk/EN/cars?page=150',
-            # 'http://www.hitad.lk/EN/cars?page=175',
-            # 'http://www.hitad.lk/EN/cars?page=200',
-            # 'http://www.hitad.lk/EN/cars?page=225',
-            # 'http://www.hitad.lk/EN/cars?page=250',
-            # 'http://www.hitad.lk/EN/cars?page=275',
-            # 'http://www.hitad.lk/EN/cars?page=300',
         ]
         for i in range (25, 1000, 25):
             domain_url = 'http://www.hitad.lk/EN/cars?page='
@@ -54,7 +48,7 @@ class QuotesSpider(scrapy.Spider):
         for ads in response.css('ul.cat-ads'):
             yield {
 
-                'title': ads.css('h4.fw_b::text').extract_first(),
-                'location': ads.css('div.item-facets2 > font.hidden-xs::text').extract_first(),
+                'title': QuotesSpider.process_text(ads.css('h4.fw_b::text').extract_first()),
+                'location': QuotesSpider.process_text(ads.css('div.item-facets2 > font.hidden-xs::text').extract_first()),
                 'price': ads.css('span.list-price-value::text').extract_first(),
             }
