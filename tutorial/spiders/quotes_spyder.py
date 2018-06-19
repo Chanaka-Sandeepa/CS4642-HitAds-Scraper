@@ -9,38 +9,24 @@ class QuotesSpider(scrapy.Spider):
         text = text.replace('\r', '')
         text = text.replace('\t', '')
         text = text.replace("\n", "")
+        text = text.replace("-", "")
+        return text
+
+    def process_date(text):
+        text = text.replace('Date : ', '')
         return text
 
     def start_requests(self):
 
         urls = [
-            # 'http://www.trc.gov.lk/2014-05-13-13-23-17/events/755-15th-apt-telecommunication-ict-development-forum.html',
-            # 'http://www.trc.gov.lk/world-telecommunication-information-society-day-2018.html',
-            # 'http://www.trc.gov.lk/notice-to-cable-tv-and-direct-to-home-satellite-tv-service-providers.html',
-            # 'http://www.trc.gov.lk/mr-p-r-s-p-jayathilake-is-the-new-director-general-of-trcsl.html',
-            # 'http://www.trc.gov.lk/2014-05-13-13-23-17/events/662-his-excellency-the-president-of-sri-lanka-graced-the-17th-apt-policy-and-regulatory-forum.html',
-            # 'http://www.trc.gov.lk/nisadiya.html',
-            # 'http://www.trc.gov.lk/2014-05-13-03-46-49/right-to-information.html',
-            # 'http://www.trc.gov.lk/spectrum-management/spectrum-management-in-sri-lanka.html',
-            # 'http://www.trc.gov.lk/2014-08-13-11-31-28/numbering.html',
-            # 'http://www.trc.gov.lk/2014-08-13-11-31-28/network-equipment/import-clearance.html',
-            # 'http://www.trc.gov.lk/2014-08-13-11-31-28/guidelines.html',
-            # 'http://www.trc.gov.lk/2014-05-12-12-36-13/system-licence/licensing-procedure-issuance-renewal.html',
-            # 'http://www.trc.gov.lk/2014-05-12-12-36-13/system-licence/licenced-operator-list.html',
-            # 'http://www.trc.gov.lk/2014-05-12-12-36-13/system-licence/public-notice-on-issuence-renewal-modification-of-licences.html',
-            # 'http://www.trc.gov.lk/2014-05-12-12-36-13/system-licence/public-consultation.html',
-            # 'http://www.trc.gov.lk/2014-05-12-12-36-13/frequency-licence.html',
-            # 'http://www.trc.gov.lk/2014-05-12-12-36-13/2014-05-12-13-18-07/list-of-licenced-vendors.html',
-            # 'http://www.trc.gov.lk/2014-05-12-12-36-13/2014-05-12-13-18-07/vendor-licence-procedure.html',
-            # 'http://www.trc.gov.lk/2014-05-12-13-20-23/tariff-regulation.html',
-            # 'http://www.trc.gov.lk/2014-05-12-13-20-23/telco-levies.html',
-            'http://www.hitad.lk/EN/cars',
+            # 'http://www.hitad.lk/EN/cars',
+            'http://www.hitad.lk/EN/vehicle'
         ]
-        for i in range (25, 1000, 25):
-            domain_url = 'http://www.hitad.lk/EN/cars?page='
-
+        for i in range (25, 10000, 25):
+            domain_url = 'http://www.hitad.lk/EN/vehicle?page='
             new_url = domain_url +str(i)
             urls.append(new_url)
+
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
@@ -51,4 +37,16 @@ class QuotesSpider(scrapy.Spider):
                 'title': QuotesSpider.process_text(ads.css('h4.fw_b::text').extract_first()),
                 'location': QuotesSpider.process_text(ads.css('div.item-facets2 > font.hidden-xs::text').extract_first()),
                 'price': ads.css('span.list-price-value::text').extract_first(),
+                'date': QuotesSpider.process_date(ads.css('div.ad-info-2::text').extract_first()),
+                'type': ads.css('div.item-facets::text')[0].extract(),
+                'category': ads.css('div.item-facets::text')[1].extract(),
+                'sub category': ads.css('div.item-facets::text')[2].extract(),
+                'condition': ads.css('div.item-facets::text')[3].extract(),
+                'brand': ads.css('div.item-facets::text')[4].extract(),
+                'model': ads.css('div.item-facets::text')[5].extract(),
+                'year': ads.css('div.item-facets::text')[6].extract(),
+                # for data in ads.css('div.item-facets'):
+                #     'type': ads.css('span.list-price-value::text').extract_first(),
+            #
+
             }
